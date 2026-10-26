@@ -5,6 +5,7 @@
 
 // Tipler
 export * from './types';
+export * from './definitions/entities';
 
 // Varsayılan Veriler
 export * from './defaults/defaultBanks';

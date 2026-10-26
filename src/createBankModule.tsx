@@ -15,6 +15,7 @@ import {
 
 import BankalarPageComponent, { BankaCard } from './pages/BankalarPage';
 import BankaSubeleriPageComponent from './pages/BankaSubeleriPage';
+import { bankCards, bankDocuments, bankOperations, bankReports } from './definitions/entities';
 
 export function createBankModule(options?: CreateBankModuleOptions): IModuleDefinition {
   const id = options?.id || 'bankalar_ve_subeler_modulu';
@@ -96,34 +97,16 @@ export function createBankModule(options?: CreateBankModuleOptions): IModuleDefi
         component: ConnectedBankalarPage,
       },
     ],
-    cards: [
-      {
-        id: 'bankalar-karti',
-        category: 'kart',
-        titleKey: 'Banka Kartı',
-        route: '/bankalar',
-      },
+    strictEntityRegistration: true,
+    whitelistedRoutes: [
+      '/ayarlar/bankalar',
+      '/ayarlar/bankalar/:id/subeler',
+      '/ayarlar/BankalarVeSubeler'
     ],
-    operations: [
-      {
-        id: 'banka-islem',
-        category: 'islem',
-        titleKey: 'Banka ve Şube İşlemleri',
-        useStandardCrud: false,
-        customActions: [
-          {
-            action: 'sync',
-            labelKey: "TCMB'den Bankaları ve Şubeleri Güncelleme",
-            description: "TCMB resmi web servisinden tüm banka ve şube verilerini çekip eşitleme yetkisi.",
-          },
-          {
-            action: 'toggle_branch',
-            labelKey: 'Şube Aktiflik Durumunu Değiştirme',
-            description: 'Banka şubesinin sistemde aktif veya pasif durumunu değiştirme yetkisi.',
-          },
-        ],
-      },
-    ],
+    cards: bankCards,
+    documents: bankDocuments,
+    operations: bankOperations,
+    reports: bankReports,
     permissions: [
       {
         key: 'bank.view',
