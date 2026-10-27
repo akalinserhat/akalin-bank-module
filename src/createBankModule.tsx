@@ -34,14 +34,14 @@ export function createBankModule(options?: CreateBankModuleOptions): IModuleDefi
 
   // Lazy / Connected Sayfa Sarıcıları
   const ConnectedBankalarPage: React.FC<any> = (props) => (
-    <BankModuleProvider adapter={adapter} appName={appName} baseRoute={baseRoute} onNotify={options?.onNotify}>
-      <BankalarPageComponent {...props} baseRoute={baseRoute} />
+    <BankModuleProvider adapter={adapter} appName={appName} baseRoute={props.baseRoute || baseRoute} onNotify={options?.onNotify}>
+      <BankalarPageComponent {...props} />
     </BankModuleProvider>
   );
 
   const ConnectedBankaSubeleriPage: React.FC<any> = (props) => (
-    <BankModuleProvider adapter={adapter} appName={appName} baseRoute={baseRoute} onNotify={options?.onNotify}>
-      <BankaSubeleriPageComponent {...props} baseRoute={baseRoute} />
+    <BankModuleProvider adapter={adapter} appName={appName} baseRoute={props.baseRoute || baseRoute} onNotify={options?.onNotify}>
+      <BankaSubeleriPageComponent {...props} />
     </BankModuleProvider>
   );
 
@@ -84,6 +84,11 @@ export function createBankModule(options?: CreateBankModuleOptions): IModuleDefi
         element: React.createElement(ConnectedBankalarPage),
         title: 'Bankalar & Şubeler',
       },
+      {
+        path: '/ayarlar/BankalarVeSubeler/:id/subeler',
+        element: React.createElement(ConnectedBankaSubeleriPage),
+        title: 'Banka Şubeleri',
+      },
     ],
     menuItems: [],
     settingsModules: [
@@ -99,9 +104,12 @@ export function createBankModule(options?: CreateBankModuleOptions): IModuleDefi
     ],
     strictEntityRegistration: true,
     whitelistedRoutes: [
+      '/bankalar',
+      '/bankalar/:id/subeler',
       '/ayarlar/bankalar',
       '/ayarlar/bankalar/:id/subeler',
-      '/ayarlar/BankalarVeSubeler'
+      '/ayarlar/BankalarVeSubeler',
+      '/ayarlar/BankalarVeSubeler/:id/subeler'
     ],
     cards: bankCards,
     documents: bankDocuments,

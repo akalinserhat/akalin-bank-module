@@ -28,6 +28,16 @@ export function createRestBankAdapter(options?: {
       Accept: 'application/json',
       ...(extra || {}),
     };
+    if (typeof window !== 'undefined') {
+      const token =
+        localStorage.getItem('admin_token') ||
+        localStorage.getItem('token') ||
+        sessionStorage.getItem('admin_token') ||
+        sessionStorage.getItem('token');
+      if (token && !headers['Authorization']) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
     if (options?.customHeaders) {
       const custom = typeof options.customHeaders === 'function' ? options.customHeaders() : options.customHeaders;
       headers = { ...headers, ...custom };
@@ -57,17 +67,17 @@ export function createRestBankAdapter(options?: {
 
   return {
     async getBanks(): Promise<BankaDTO[]> {
-      const res = await doFetch(apiPrefix, { headers: getHeaders() });
+      const res = await doFetch(apiPrefix, { headers: getHeaders(), credentials: 'include' });
       return (await handleJson(res)) || [];
     },
 
     async getBankById(id: number | string): Promise<BankaDTO> {
-      const res = await doFetch(`${apiPrefix}/${id}`, { headers: getHeaders() });
+      const res = await doFetch(`${apiPrefix}/${id}`, { headers: getHeaders(), credentials: 'include' });
       return await handleJson(res);
     },
 
     async getBranchesByBankId(bankId: number | string): Promise<BankaSubeDTO[]> {
-      const res = await doFetch(`${apiPrefix}/${bankId}/subeler`, { headers: getHeaders() });
+      const res = await doFetch(`${apiPrefix}/${bankId}/subeler`, { headers: getHeaders(), credentials: 'include' });
       return (await handleJson(res)) || [];
     },
 
@@ -75,6 +85,7 @@ export function createRestBankAdapter(options?: {
       const res = await doFetch(`${apiPrefix}/sync-tcmb-all`, {
         method: 'POST',
         headers: getHeaders({ 'Content-Type': 'application/json' }),
+        credentials: 'include',
       });
       return await handleJson(res);
     },
@@ -83,6 +94,7 @@ export function createRestBankAdapter(options?: {
       const res = await doFetch(`${apiPrefix}/sube/${branchId}/toggle-aktif`, {
         method: 'PUT',
         headers: getHeaders({ 'Content-Type': 'application/json' }),
+        credentials: 'include',
       });
       return await handleJson(res);
     },

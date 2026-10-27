@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { DownloadCloud, Building2, MapPin, RefreshCcw } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BaseSystemPage, BaseCard, SyncProgressModal } from '@akalin/ui';
 import { useBankModule } from '../adapters/BankServiceContext';
@@ -16,9 +16,18 @@ export interface BankalarPageProps {
   baseRoute?: string;
 }
 
-export const BankalarPage: React.FC<BankalarPageProps> = ({ baseRoute = '/bankalar' }) => {
+export const BankalarPage: React.FC<BankalarPageProps> = ({ baseRoute: propBaseRoute }) => {
   const { t } = useTranslation();
-  const { adapter, onNotify } = useBankModule();
+  const { adapter, onNotify, baseRoute: ctxBaseRoute } = useBankModule();
+  const location = useLocation();
+
+  const baseRoute = useMemo(() => {
+    if (propBaseRoute) return propBaseRoute;
+    const path = location?.pathname || '';
+    if (path.startsWith('/ayarlar/BankalarVeSubeler')) return '/ayarlar/BankalarVeSubeler';
+    if (path.startsWith('/ayarlar/bankalar')) return '/ayarlar/bankalar';
+    return ctxBaseRoute || '/bankalar';
+  }, [propBaseRoute, ctxBaseRoute, location?.pathname]);
 
   const [banks, setBanks] = useState<BankaDTO[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,6 +58,7 @@ export const BankalarPage: React.FC<BankalarPageProps> = ({ baseRoute = '/bankal
       const data = await adapter.getBanks();
       setBanks(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error('Bankalar yüklenirken hata:', error);
       notify('error', t('bankalar_yuklenirken_hata', 'Bankalar yüklenirken hata oluştu.'));
     } finally {
       setLoading(false);
@@ -126,6 +136,8 @@ export const BankalarPage: React.FC<BankalarPageProps> = ({ baseRoute = '/bankal
       onSearchChange={(term) => setSearchTerm(term)}
       headerSync={false}
       baseRoute={baseRoute}
+      showBackButton={location?.pathname?.startsWith('/ayarlar')}
+      backRoute="/ayarlar"
     >
       <SyncProgressModal isOpen={isSyncModalOpen} onClose={handleModalClose} />
 

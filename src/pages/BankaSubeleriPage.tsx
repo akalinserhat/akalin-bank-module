@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { MapPin, ArrowLeft, RefreshCcw, Building2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -17,11 +17,20 @@ export interface BankaSubeleriPageProps {
   baseRoute?: string;
 }
 
-export const BankaSubeleriPage: React.FC<BankaSubeleriPageProps> = ({ baseRoute = '/bankalar' }) => {
+export const BankaSubeleriPage: React.FC<BankaSubeleriPageProps> = ({ baseRoute: propBaseRoute }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
-  const { adapter, onNotify } = useBankModule();
+  const { adapter, onNotify, baseRoute: ctxBaseRoute } = useBankModule();
+
+  const baseRoute = useMemo(() => {
+    if (propBaseRoute) return propBaseRoute;
+    const path = location?.pathname || '';
+    if (path.startsWith('/ayarlar/BankalarVeSubeler')) return '/ayarlar/BankalarVeSubeler';
+    if (path.startsWith('/ayarlar/bankalar')) return '/ayarlar/bankalar';
+    return ctxBaseRoute || '/bankalar';
+  }, [propBaseRoute, ctxBaseRoute, location?.pathname]);
 
   const [banka, setBanka] = useState<BankaDTO | null>(null);
   const [subeler, setSubeler] = useState<BankaSubeDTO[]>([]);
